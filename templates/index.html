@@ -81,27 +81,30 @@
                 years: parseInt(years, 10)
             })
         })
+        .then(response => response.json())
         .then(data => {
             const resultTable = document.getElementById('resultTable');
             resultTable.innerHTML = ''; // Clear previous results
 
             data.yearly_values.forEach(([year, value]) => {
-                const row = resultTable.insertRow(-1); // -1 appends the row to the end of the table
+                const row = resultTable.insertRow(-1);
                 const cellYear = row.insertCell(0);
                 const cellValue = row.insertCell(1);
                 cellYear.textContent = `Year ${year}`;
-                cellValue.textContent = value.toFixed(2);
+                cellValue.textContent = `$${value.toFixed(2)}`;
             });
 
-            // Add the total value row
             const totalRow = resultTable.insertRow(-1);
             const totalCellLabel = totalRow.insertCell(0);
             totalCellLabel.textContent = 'Total Present Value';
             const totalCellValue = totalRow.insertCell(1);
-            totalCellValue.textContent = data.total_value.toFixed(2);
+            totalCellValue.textContent = `$${data.total_value.toFixed(2)}`;
 
             document.getElementById('result').style.display = 'block'; // Show the result div
         })
+        .catch(error => {
+            console.error('Error:', error);
+        });
         }
     </script>
 </body>
