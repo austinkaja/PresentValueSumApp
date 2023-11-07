@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Present Value Calculator</title>
+        <title>Future Value Calculator</title>
         <style>
             body { 
                 font-family: Arial, sans-serif; 
@@ -46,7 +46,7 @@
     </head>
     <body>
         <div class="container">
-            <h2>Present Value Calculator</h2>
+            <h2>Future Value Calculator</h2>
             <input type="number" id="payment" placeholder="Initial Payment Value" step="0.01" min="0">
             <input type="number" id="interest_rate" placeholder="Interest Rate (decimal)" step="0.01" min="0">
             <input type="number" id="years" placeholder="Number of Years" min="0">
@@ -102,7 +102,7 @@
 
                     const totalRow = resultTable.insertRow(-1);
                     const totalCellLabel = totalRow.insertCell(0);
-                    totalCellLabel.textContent = 'Total Present Value';
+                    totalCellLabel.textContent = 'Total Future Value';
                     const totalCellValue = totalRow.insertCell(1);
                     totalCellValue.textContent = `$${data.total_value.toFixed(2)}`;
 
