@@ -1,111 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Present Value Calculator</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #121212;
-            color: #e1e1e1;
-        }
-        .container { 
-            max-width: 380px; 
-            margin: 50px auto; 
-            padding: 20px; 
-            background: #1e1e1e;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); 
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-            background: #2a2a2a;
-            color: #ddd;
-            border: 1px solid #444;
-        }
-        button {
-            background: #8A2BE2;
-            color: #fff;
-            border: none;
-        }
-        button:hover { background: #6921c4; }
-        #result {
-            color: #4CAF50;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #444; 
-            background: #2a2a2a;
-            overflow: auto;
-        }
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Present Value Calculator</h2>
-        <input type="number" id="payment" placeholder="Initial Payment Value" step="0.01" min="0">
-        <input type="number" id="interest_rate" placeholder="Interest Rate (decimal)" step="0.01" min="0">
-        <input type="number" id="years" placeholder="Number of Years" min="0">
-        <button onclick="calculatePresentValue()">Calculate</button>
-        <div id="result" style="display: none;"> <!-- Initially hidden -->
-            <table id="resultTable">
-                <!-- Table rows will be added here by the JavaScript -->
-            </table>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Present Value Calculator</title>
+        <style>
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 0; 
+                padding: 0; 
+                background-color: #121212;
+                color: #e1e1e1;
+            }
+            .container { 
+                max-width: 380px; 
+                margin: 50px auto; 
+                padding: 20px; 
+                background: #1e1e1e;
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); 
+            }
+            input, button {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                box-sizing: border-box;
+                background: #2a2a2a;
+                color: #ddd;
+                border: 1px solid #444;
+            }
+            button {
+                background: #8A2BE2;
+                color: #fff;
+                border: none;
+            }
+            button:hover { background: #6921c4; }
+            #result {
+                color: #4CAF50;
+                padding: 10px;
+                margin-top: 10px;
+                border: 1px solid #444; 
+                background: #2a2a2a;
+                overflow: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Present Value Calculator</h2>
+            <input type="number" id="payment" placeholder="Initial Payment Value" step="0.01" min="0">
+            <input type="number" id="interest_rate" placeholder="Interest Rate (decimal)" step="0.01" min="0">
+            <input type="number" id="years" placeholder="Number of Years" min="0">
+            <button onclick="calculatePresentValue()">Calculate</button>
+            <div id="result" style="display: none;"> <!-- Initially hidden -->
+                <table id="resultTable">
+                    <!-- Table rows will be added here by the JavaScript -->
+                </table>
+            </div>
         </div>
-    </div>
-    
-    <script>
-        function calculatePresentValue() {
-        var payment = document.getElementById('payment').value;
-        var interest_rate = document.getElementById('interest_rate').value;
-        var years = document.getElementById('years').value;
+        
+        <script>
+            function calculatePresentValue() {
+                var payment = document.getElementById('payment').value;
+                var interest_rate = document.getElementById('interest_rate').value;
+                var years = document.getElementById('years').value;
 
-        if (!payment || !interest_rate || !years) {
-            document.getElementById('result').innerText = "Please fill out all fields.";
-            return;
-        }
+                if (!payment || !interest_rate || !years) {
+                    document.getElementById('result').innerText = "Please fill out all fields.";
+                    document.getElementById('result').style.display = 'block';
+                    return;
+                }
 
-        fetch('/calculate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                payment: parseFloat(payment),
-                interest_rate: parseFloat(interest_rate),
-                years: parseInt(years, 10)
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            const resultTable = document.getElementById('resultTable');
-            resultTable.innerHTML = ''; // Clear previous results
+                fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payment: parseFloat(payment),
+                        interest_rate: parseFloat(interest_rate),
+                        years: parseInt(years, 10)
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('result').innerText = data.error;
+                        document.getElementById('result').style.display = 'block';
+                        return;
+                    }
 
-            data.yearly_values.forEach(([year, value]) => {
-                const row = resultTable.insertRow(-1);
-                const cellYear = row.insertCell(0);
-                const cellValue = row.insertCell(1);
-                cellYear.textContent = `Year ${year}`;
-                cellValue.textContent = `$${value.toFixed(2)}`;
-            });
+                    const resultTable = document.getElementById('resultTable');
+                    resultTable.innerHTML = ''; // Clear previous results
 
-            const totalRow = resultTable.insertRow(-1);
-            const totalCellLabel = totalRow.insertCell(0);
-            totalCellLabel.textContent = 'Total Present Value';
-            const totalCellValue = totalRow.insertCell(1);
-            totalCellValue.textContent = `$${data.total_value.toFixed(2)}`;
+                    data.yearly_values.forEach(([year, value]) => {
+                        const row = resultTable.insertRow(-1); // -1 appends the row to the end of the table
+                        const cellYear = row.insertCell(0);
+                        const cellValue = row.insertCell(1);
+                        cellYear.textContent = `Year ${year}`;
+                        cellValue.textContent = `$${value.toFixed(2)}`;
+                    });
 
-            document.getElementById('result').style.display = 'block'; // Show the result div
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-        }
-    </script>
-</body>
+                    // Add the total value row
+                    const totalRow = resultTable.insertRow(-1);
+                    const totalCellLabel = totalRow.insertCell(0);
+                    totalCellLabel.textContent = 'Total Present Value';
+                    const totalCellValue = totalRow.insertCell(1);
+                    totalCellValue.textContent = `$${data.total_value.toFixed(2)}`;
+
+                    document.getElementById('result').style.display = 'block'; // Show the result div
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerText = "An error occurred while calculating.";
+                    document.getElementById('result').style.display = 'block';
+                });
+            }
+        </script>
+    </body>
 </html>
