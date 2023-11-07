@@ -1,1 +1,1 @@
-web: gunicorn app:PresentValue
+web: gunicorn PresentValue:app
